@@ -6,19 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout repo 
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Setup Node
         uses: actions/setup-node@v3
-        with: 
+        with:
           node-version: 16.x
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Packages
         run: npm install
 
       - name: Check Lint
         run: npm run lint
-        
-    

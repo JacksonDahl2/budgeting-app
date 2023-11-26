@@ -1,9 +1,7 @@
-import { Text } from 'react-native'
+import { Text } from "react-native";
 
 const StateItem = () => {
-  return (
-    <Text> Test </Text>
-  )
-}
+  return <Text> Test </Text>;
+};
 
-export default StateItem
+export default StateItem;
