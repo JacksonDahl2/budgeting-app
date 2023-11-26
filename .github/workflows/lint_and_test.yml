@@ -1,0 +1,24 @@
+name: Lint & Test
+on: [pull_request, workflow_dispatch]
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo 
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with: 
+          node-version: 16.x
+          cache: 'npm'
+
+      - name: Install Packages
+        run: npm install
+
+      - name: Check Lint
+        run: npm run lint
+        
+    
