@@ -16,7 +16,9 @@ jobs:
           cache: "npm"
 
       - name: Install Packages
+        working-directory: ./frontend
         run: npm install
 
       - name: Check Lint
+        working-directory: ./frontend
         run: npm run lint
