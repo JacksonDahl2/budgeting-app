@@ -11,6 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    working-directory: ./rust_api
   
     steps:
     - name: Checkout code
@@ -59,6 +60,7 @@ jobs:
       run: sudo apt-get install sshpass
 
     - name: Copy docker-compose.yml to droplet
+      working-directory: ./rust_api
       run: sshpass -v -p ${{ secrets.DROPLET_PASSWORD }} scp -o StrictHostKeyChecking=no docker-compose.yml root@${{ vars.DROPLET_IP }}:~
 
     - name: Deploy
@@ -68,7 +70,7 @@ jobs:
         username: root
         password: ${{ secrets.DROPLET_PASSWORD }}
         script: |
-          cd ~
+          cd ~/rust_api
           export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           docker-compose down
           docker-compose pull
