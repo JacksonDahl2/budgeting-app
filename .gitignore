@@ -166,3 +166,5 @@ yarn-error.*
 
 # rust generated 
 rust_api/target/
+
+rust_api/Cargo.lock
