@@ -163,3 +163,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# rust generated 
+rust_api/target/
