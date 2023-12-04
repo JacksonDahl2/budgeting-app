@@ -8,16 +8,16 @@ use axum::{
 use dotenvy::dotenv;
 
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PGPoolOptions;
+use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 
 #[tokio::main]
-async fn main() => anyhow::Result<()> {
+async fn main() -> anyhow::Result<()> {
     dotenv().ok();
 
     let url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
-    let pool = PGPoolOptions::new()
+    let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&url)
         .await
@@ -27,7 +27,7 @@ async fn main() => anyhow::Result<()> {
 
     let addr: std::net::SocketAddr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
 
-    println("listening on {}", addr);
+    println!("listening on {}", addr);
 
     axum::Server::bind(&addr)
         .serve(app().layer(Extension(pool)).into_make_service())
@@ -40,13 +40,13 @@ async fn main() => anyhow::Result<()> {
 #[derive(Serialize, Deserialize)]
 pub struct User {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<i32>
+    pub id: Option<i32>,
     pub name: String,
     pub email: String,
 }
 
-// Having a function that produces our app makes it easy to call it from tests
-// without having to create an HTTP server
+/// Having a function that produces our app makes it easy to call it from tests
+/// without having to create an HTTP server.
 #[allow(dead_code)]
 fn app() -> Router {
     Router::new()
@@ -57,7 +57,7 @@ fn app() -> Router {
 }
 
 async fn handler() -> &'static str {
-    "Lets get Rusty!"
+    "Let's Get Rusty!"
 }
 
 async fn get_users(state: Extension<Pool<Postgres>>) -> Json<Vec<User>> {
@@ -66,7 +66,7 @@ async fn get_users(state: Extension<Pool<Postgres>>) -> Json<Vec<User>> {
     let records = sqlx::query!("SELECT * FROM users")
         .fetch_all(&pool)
         .await
-        .expect("Failed to fetch users")
+        .expect("failed to fetch users");
 
     let records = records
         .iter()
@@ -76,8 +76,9 @@ async fn get_users(state: Extension<Pool<Postgres>>) -> Json<Vec<User>> {
             email: r.email.clone(),
         })
         .collect();
+
     Json(records)
-}       
+}
 
 pub async fn create_user(
     state: Extension<Pool<Postgres>>,
@@ -88,7 +89,7 @@ pub async fn create_user(
     let row = sqlx::query!(
         "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email",
         user.name,
-        user.email 
+        user.email
     )
     .fetch_one(&pool)
     .await
@@ -101,12 +102,10 @@ pub async fn create_user(
     })
 }
 
-pub async fn delete_user(state: Extension<Pool<Postgres>>, Path(user_id): Path<i32>) -> StatusCode{
+pub async fn delete_user(state: Extension<Pool<Postgres>>, Path(user_id): Path<i32>) -> StatusCode {
     let Extension(pool) = state;
 
-    let row = sqlx::query!(
-        "DELETE FROM users WHERE id = $1", user_id
-    )
+    sqlx::query!("DELETE FROM users WHERE id = $1", user_id)
         .execute(&pool)
         .await
         .expect("Failed to delete user");
@@ -118,10 +117,10 @@ pub async fn delete_user(state: Extension<Pool<Postgres>>, Path(user_id): Path<i
 mod tests {
     use super::*;
     use axum::{
-        body:Body,
+        body::Body,
         http::{Request, StatusCode},
     };
-    use Tower::util::ServiceExt; // for 'oneshot'
+    use tower::util::ServiceExt; // for `oneshot`
 
     #[tokio::test]
     async fn hello_world() {
@@ -133,36 +132,10 @@ mod tests {
             .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
             .await
             .unwrap();
-        
+
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
-        assert_eq!(&body[..], b"Let's get Rusty!");
-
+        assert_eq!(&body[..], b"Let's Get Rusty!");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
