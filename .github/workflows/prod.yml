@@ -11,7 +11,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    working-directory: ./rust_api
   
     steps:
     - name: Checkout code
@@ -24,6 +23,7 @@ jobs:
           toolchain: stable
 
     - name: Build and test code
+      working-directory: ./rust_api
       run: |
         cargo build --verbose
         cargo test --verbose
